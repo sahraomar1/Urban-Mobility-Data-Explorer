@@ -20,7 +20,7 @@ CREATE TABLE trips (
     pickup_hour SMALLINT
 );
 
--- Indexes
+-- Indexes Made
 CREATE INDEX idx_trips_pickup_datetime ON trips(pickup_datetime);
 CREATE INDEX idx_trips_dropoff_datetime ON trips(dropoff_datetime);
 CREATE INDEX idx_trips_vendor ON trips(vendor_id);
