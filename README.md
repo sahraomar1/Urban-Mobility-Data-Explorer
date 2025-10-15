@@ -1,7 +1,7 @@
 # to run the api 
 ## on python terminal
 cd to API directory 
-run C:/Python313/python.exe -m uvicorn API.trips_api:app --reload   
+run C:/Python313/python.exe -m uvicorn API.trips_api:app --reload --port 8003
 
 # to start db 
 ## on wsl
