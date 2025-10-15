@@ -2,313 +2,300 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NYC Taxi Data Dashboard</title>
-    <!-- We need these libraries for the map and chart -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Taxi Trips Viewer</title>
     
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
     <style>
-        /* This is all the styling for the page. It's simple so it's easy to understand. */
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            background-color: #f8f9fa;
+            padding: 2rem;
+            background-color: #f4f7f6;
             color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px-12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a1a1a;
+            text-align: center;
+        }
+        .controls {
             display: flex;
-            height: 100vh;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
         }
-
-        /* The sidebar holds our filters */
-        .sidebar {
-            width: 280px;
-            background-color: #ffffff;
-            padding: 20px;
-            border-right: 1px solid #dee2e6;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+        select, input, button {
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
         }
-
-        /* The main area holds all the data */
-        .main-content {
-            flex-grow: 1; /* This makes it take up the remaining space */
-            padding: 20px;
-            overflow-y: auto; /* Adds a scrollbar if content is too long */
+        select {
+            flex-grow: 1;
         }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 columns */
-            gap: 20px; /* Space between boxes */
-            margin-bottom: 30px;
-        }
-
-        .stat-box {
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            padding: 15px;
-            border-radius: 5px;
-        }
-
-        .stat-box h4 {
-            margin: 0 0 10px 0;
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-        .stat-box p {
-            margin: 0;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .visuals-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr; /* Map is twice as wide as chart */
-            gap: 20px;
-        }
-
-        #map {
-            height: 450px;
-        }
-
-        /* Basic styles for form elements */
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            box-sizing: border-box; 
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+        input {
+            width: 80px;
         }
         button {
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
         button:hover {
             background-color: #0056b3;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 1rem;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1rem;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            border-bottom: 3px solid #007bff;
+            font-weight: bold;
+        }
+        .view-content {
+            display: none;
+        }
+        .view-content.active {
+            display: block;
+        }
+        
+        /* Map and Table styling */
+        #map {
+            height: 600px;
+            width: 100%;
+            border-radius: 8px;
+        }
+        #results-container {
+            overflow-x: auto;
+            max-height: 600px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        #message {
+            text-align: center;
+            color: #888;
+            font-size: 1.1rem;
+            padding: 2rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR FOR FILTERS -->
-    <div class="sidebar">
-        <h2>Dashboard Filters</h2>
-        
-        <div style="margin-bottom: 20px;">
-            <label for="date-selector">Select a Date</label>
-            <input type="date" id="date-selector" disabled>
+    <div class="container">
+        <h1>NYC Taxi Trips Viewer 🚕🗺️</h1>
+        <div class="controls">
+            <select id="endpoint-select">
+                <option value="/trips">All Trip Data</option>
+                <option value="/trips/id">Trip IDs</option>
+                <option value="/trips/pickup_datetime">Pickup Datetime</option>
+                <option value="/trips/dropoff_datetime">Dropoff Datetime</option>
+                <option value="/trips/passenger_count">Passenger Count</option>
+                <option value="/trips/trip_duration">Trip Duration</option>
+                <option value="/trips/trip_distance_miles">Trip Distance (Miles)</option>
+            </select>
+            <input type="number" id="limit-input" value="50" min="1" max="1000">
+            <button id="fetch-btn">Fetch Data</button>
         </div>
-        
-        <hr style="margin: 20px 0;">
 
-        <div>
-            <label for="trip-id-search">Search by Trip ID</label>
-            <input type="text" id="trip-id-search" placeholder="e.g., id1234567">
-            <button id="trip-id-btn">Find Trip</button>
+        <div class="tabs">
+            <button class="tab-button active" onclick="showView('map-view')">🗺️ Map View</button>
+            <button class="tab-button" onclick="showView('table-view')">📋 Table View</button>
         </div>
-    </div>
 
-    <!-- MAIN CONTENT AREA -->
-    <div class="main-content" id="main-content">
-        <h1 id="dashboard-title">Daily Taxi Statistics</h1>
-        <p id="dashboard-subtitle" style="color: #6c757d;">Loading initial data...</p>
+        <div id="map-view" class="view-content active">
+             <div id="map"></div>
+        </div>
 
-        <!-- STATS AREA -->
-        <div class="stats-grid">
-            <div class="stat-box">
-                <h4>Total Trips</h4>
-                <p id="stat-trips">--</p>
-            </div>
-            <div class="stat-box">
-                <h4>Total Passengers</h4>
-                <p id="stat-passengers">--</p>
-            </div>
-            <div class="stat-box">
-                <h4>Avg Passengers / Trip</h4>
-                <p id="stat-avg-passengers">--</p>
-            </div>
-            <div class="stat-box">
-                <h4>Total Distance (mi)</h4>
-                <p id="stat-distance">--</p>
-            </div>
-            <div class="stat-box" style="grid-column: span 2;"> <!-- This box is wider -->
-                <h4>Avg Distance / Passenger (mi)</h4>
-                <p id="stat-avg-dist-passenger">--</p>
+        <div id="table-view" class="view-content">
+            <div id="results-container">
+                <p id="message">Select an endpoint, set a limit, and click "Fetch Data" to see results.</p>
             </div>
         </div>
 
-        <!-- VISUALS: MAP AND CHART -->
-        <div class="visuals-grid">
-            <div>
-                <h3>Pickup Locations</h3>
-                <div id="map"></div>
-            </div>
-            <div>
-                <h3>Trips by Hour</h3>
-                <canvas id="tripsByHourChart"></canvas>
-            </div>
-        </div>
     </div>
 
     <script>
-        // This whole block runs after the HTML page is loaded
-        document.addEventListener('DOMContentLoaded', () => {
+        const limitInput = document.getElementById('limit-input');
+        const fetchBtn = document.getElementById('fetch-btn');
+        const endpointSelect = document.getElementById('endpoint-select');
+        const resultsContainer = document.getElementById('results-container');
+        
+        // --- KEY CHANGE HERE ---
+        // Updated API_BASE_URL to point to port 8003
+        const API_BASE_URL = 'http://127.0.0.1:8003';
 
-            // The address of our Python API server
-            const API_BASE_URL = 'http://127.0.0.1:8003';
+        // --- Map Initialization ---
+        const map = L.map('map').setView([40.730610, -73.935242], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        let tripLayerGroup = L.layerGroup().addTo(map);
 
-            // Get references to the HTML elements we need to control
-            const dateSelector = document.getElementById('date-selector');
-            const tripIdBtn = document.getElementById('trip-id-btn');
-            const subtitle = document.getElementById('dashboard-subtitle');
+        // --- Event Listeners ---
+        fetchBtn.addEventListener('click', fetchData);
 
-            // We'll store our chart and map objects here so we can update them later
-            let tripsByHourChart, map;
+        // --- Functions ---
+        async function fetchData() {
+            const mapEndpoint = '/trips';
+            const tableEndpoint = endpointSelect.value;
+            const limit = limitInput.value;
             
-            // --- MAIN FUNCTION: This is where everything starts ---
-            async function initializeDashboard() {
-                try {
-                    // 1. Create the map and the chart structure
-                    initializeMap();
-                    initializeChart();
+            const mapUrl = `${API_BASE_URL}${mapEndpoint}?limit=${limit}`;
+            const tableUrl = `${API_BASE_URL}${tableEndpoint}?limit=${limit}`;
 
-                    // 2. Ask our API for the available date range
-                    const dateInfo = await fetchData('/dates');
+            tripLayerGroup.clearLayers();
+            resultsContainer.innerHTML = `<p id="message">Loading...</p>`;
+            const loadingPopup = L.popup()
+                .setLatLng(map.getCenter())
+                .setContent('<h3>Loading trip data...</h3>')
+                .openOn(map);
+
+            try {
+                const [mapResponse, tableResponse] = await Promise.all([
+                    fetch(mapUrl),
+                    fetch(tableUrl)
+                ]);
+
+                if (!mapResponse.ok || !tableResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${mapResponse.status} / ${tableResponse.status}`);
+                }
+
+                const mapData = await mapResponse.json();
+                const tableData = await tableResponse.json();
+                
+                loadingPopup.remove();
+
+                renderMap(mapData);
+                renderTable(tableData);
+
+            } catch (error) {
+                loadingPopup.remove();
+                console.error("Fetch error:", error);
+                const errorMsg = `<p id="message" style="color: red;">Failed to fetch data. Make sure your API is running at ${API_BASE_URL}.</p>`;
+                resultsContainer.innerHTML = errorMsg;
+            }
+        }
+        
+        function renderMap(data) {
+            if (!data || data.length === 0) {
+                 L.popup()
+                .setLatLng(map.getCenter())
+                .setContent('<h3>No trip data to display.</h3>')
+                .openOn(map);
+                return;
+            };
+
+            const bounds = [];
+            data.forEach(trip => {
+                if (trip.pickup_latitude && trip.pickup_longitude && trip.dropoff_latitude && trip.dropoff_longitude) {
+                    const pickupLatLng = [trip.pickup_latitude, trip.pickup_longitude];
+                    const dropoffLatLng = [trip.dropoff_latitude, trip.dropoff_longitude];
+
+                    L.circleMarker(pickupLatLng, { radius: 5, color: 'green', fillOpacity: 0.8 })
+                        .bindPopup(`<b>Trip ID: ${trip.id}</b><br>Pickup Point`)
+                        .addTo(tripLayerGroup);
                     
-                    // 3. Set up the date picker with the correct min/max dates
-                    dateSelector.min = dateInfo.min_date;
-                    dateSelector.max = dateInfo.max_date;
-                    // CHANGE THIS LINE:
-                    dateSelector.value = dateInfo.last_valid_date; // Use the guaranteed good date
-                    dateSelector.disabled = false;
+                    L.circleMarker(dropoffLatLng, { radius: 5, color: 'red', fillOpacity: 0.8 })
+                        .bindPopup(`<b>Trip ID: ${trip.id}</b><br>Dropoff Point`)
+                        .addTo(tripLayerGroup);
 
-                    // 4. Load all the data for that default date
-                    // AND CHANGE THIS LINE:
-                    await loadAndDisplayDataForDate(dateInfo.last_valid_date); // Load the guaranteed good date
-
-                } catch (error) {
-                    // If anything goes wrong, show a simple error message
-                    alert(`Initialization failed: ${error.message}`);
-                }
-            }
-            
-            // --- HELPER FUNCTIONS ---
-
-            // A simple function to get data from any endpoint of our API
-            async function fetchData(endpoint) {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`);
-                if (!response.ok) {
-                    throw new Error(`The API server is not responding. Please make sure it's running.`);
-                }
-                return response.json();
-            }
-
-            // This function gets all the data for a specific day and updates the page
-            async function loadAndDisplayDataForDate(date) {
-                try {
-                    subtitle.textContent = `Fetching data for ${date}...`;
+                    L.polyline([pickupLatLng, dropoffLatLng], { color: '#007bff', weight: 2, opacity: 0.6 }).addTo(tripLayerGroup);
                     
-                    // Ask the API for stats, hourly data, and map data all at the same time
-                    const [stats, hourlyData, mapData] = await Promise.all([
-                        fetchData(`/stats?date=${date}`),
-                        fetchData(`/trips_by_hour?date=${date}`),
-                        fetchData(`/map_data?date=${date}`)
-                    ]);
-
-                    // Update all dashboard parts with the new data we just got
-                    updateKPIs(stats);
-                    updateHourlyChart(hourlyData);
-                    updateMap(mapData);
-                    subtitle.textContent = `Showing statistics for ${date}`;
-
-                } catch (error) {
-                    alert(`Failed to load data for ${date}.`);
-                }
-            }
-
-            // Sets up the map view for the first time
-            function initializeMap() {
-                 map = L.map('map').setView([40.7580, -73.9855], 12); // Centered on NYC
-                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            }
-
-            // Creates the empty bar chart for the first time
-            function initializeChart() {
-                const context = document.getElementById('tripsByHourChart').getContext('2d');
-                tripsByHourChart = new Chart(context, {
-                    type: 'bar',
-                    data: {
-                        labels: Array.from({length: 24}, (_, i) => `${i}:00`), // Labels "0:00", "1:00", etc.
-                        datasets: [{ label: 'Number of Trips', data: [] }]
-                    },
-                    options: { plugins: { legend: { display: false } } }
-                });
-            }
-
-            // Puts the numbers into the stat boxes at the top
-            function updateKPIs(stats) {
-                document.getElementById('stat-trips').textContent = Number(stats.total_trips).toLocaleString();
-                document.getElementById('stat-passengers').textContent = Number(stats.total_passengers).toLocaleString();
-                document.getElementById('stat-avg-passengers').textContent = Number(stats.avg_passengers_per_trip).toFixed(2);
-                document.getElementById('stat-distance').textContent = Number(stats.total_distance_miles).toFixed(1);
-                document.getElementById('stat-avg-dist-passenger').textContent = Number(stats.avg_dist_per_passenger).toFixed(2);
-            }
-
-            // Puts new data into the bar chart
-            function updateHourlyChart(hourlyData) {
-                const tripCounts = hourlyData.map(item => item.count);
-                tripsByHourChart.data.datasets[0].data = tripCounts;
-                tripsByHourChart.update();
-            }
-
-            // Removes old markers and adds new ones to the map
-            function updateMap(mapData) {
-                // Clear any existing markers first
-                map.eachLayer(layer => {
-                    if (layer instanceof L.Marker) map.removeLayer(layer);
-                });
-                // Add new markers from the data
-                mapData.forEach(trip => {
-                    L.marker([trip.pickup_latitude, trip.pickup_longitude]).addTo(map);
-                });
-            }
-            
-            // --- EVENT LISTENERS (Handles what happens when you click stuff) ---
-
-            // When the user picks a new date from the calendar
-            dateSelector.addEventListener('change', (event) => {
-                loadAndDisplayDataForDate(event.target.value);
-            });
-
-            // When the user clicks the "Find Trip" button
-            tripIdBtn.addEventListener('click', async () => {
-                const tripId = document.getElementById('trip-id-search').value.trim();
-                if (!tripId) return; // Do nothing if the search box is empty
-
-                try {
-                    const trip = await fetchData(`/trip/${tripId}`);
-                    // Manually update the dashboard for this one trip
-                    updateKPIs({
-                        total_trips: 1,
-                        total_passengers: trip.passenger_count,
-                        total_distance_miles: trip.trip_distance_miles,
-                        avg_passengers_per_trip: trip.passenger_count,
-                        avg_dist_per_passenger: (trip.trip_distance_miles / trip.passenger_count)
-                    });
-                    updateHourlyChart([]); // Clear the hourly chart
-                    updateMap([trip]);     // Show only this one trip on the map
-                    subtitle.textContent = `Displaying data for single Trip ID: ${tripId}`;
-                } catch (error) {
-                    alert('That Trip ID was not found.');
+                    bounds.push(pickupLatLng);
+                    bounds.push(dropoffLatLng);
                 }
             });
 
-            // --- START THE APP ---
-            initializeDashboard();
-        });
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+        
+        function renderTable(data) {
+            if (data.length === 0) {
+                resultsContainer.innerHTML = '<p id="message">No data returned for this endpoint.</p>';
+                return;
+            }
+            resultsContainer.innerHTML = '';
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+            const headerRow = document.createElement('tr');
+            const headers = Object.keys(data[0]);
+
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText.replace(/_/g, ' ').toUpperCase();
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const cell = document.createElement('td');
+                    let cellValue = item[header];
+                    if (typeof cellValue === 'string' && cellValue.includes('T')) {
+                        cellValue = new Date(cellValue).toLocaleString();
+                    }
+                    cell.textContent = cellValue;
+                    row.appendChild(cell);
+                });
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            resultsContainer.appendChild(table);
+        }
+        
+        function showView(viewId) {
+            document.querySelectorAll('.view-content').forEach(view => view.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(viewId).classList.add('active');
+            document.querySelector(`button[onclick="showView('${viewId}')"]`).classList.add('active');
+        }
+
     </script>
 </body>
 </html>
