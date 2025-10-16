@@ -52,7 +52,7 @@ python --version
 
 
 # TO INSTALL THE CLEANED_CSV FILE TO THE DATABASE FOLDER
-- RUN THE  install_cleaned_trips_csv.sh
+- install_cleaned_trips_csv.sh
 
 # to install  postgress (wsl)
 - sudo apt update
@@ -67,7 +67,7 @@ python --version
 - bash setup_db.sh
 
 # create python environment
-- cd to Urban-Mobility-Data-Explorer
+- cd Urban-Mobility-Data-Explorer
 - run python3 -m venv venv
 
 # activate python environment
@@ -84,8 +84,8 @@ python --version
 - pip install -r requirements.txt
 
 # to run the api
-- cd to API
-- run uvicorn trips_api:app --reload --port 8003
+- cd API
+- uvicorn trips_api:app --reload --port 8003
 
 
 # Outputs for the Website

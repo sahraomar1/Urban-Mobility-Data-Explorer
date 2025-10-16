@@ -1,11 +1,22 @@
 #!/bin/bash
-#The script creates all the database tables and copies the data into it as well
-# 1. Create the database
+# Simple script to set up PostgreSQL database, table, and import CSV
+
+
+# Fixes Windows line endings problem for this script
+sed -i 's/\r$//' "$0"
+
+# 1. Sets a password for the user who is postgres
+psql -U postgres -c "ALTER USER postgres WITH PASSWORD 'garangbse';"
+
+# 2. Creates the database
 psql -U postgres -c "CREATE DATABASE nyc_taxi;"
 
-# 2. Create the table
+# 3. Grants all privileges to the postgres user
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE nyc_taxi TO postgres;"
+
+# 4. Creates the table called trips
 psql -U postgres -d nyc_taxi -c "
-CREATE TABLE IF NOT EXISTS trips (
+CREATE TABLE trips (
     id VARCHAR(20) PRIMARY KEY,
     vendor_id SMALLINT,
     pickup_datetime TIMESTAMP,
@@ -23,5 +34,5 @@ CREATE TABLE IF NOT EXISTS trips (
 );
 "
 
-# 3. Load the CSV data
+# 5. Loads the csv data into the database
 psql -U postgres -d nyc_taxi -c "\copy trips(id, vendor_id, pickup_datetime, dropoff_datetime, passenger_count, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, store_and_fwd_flag, trip_duration, trip_distance_miles, average_speed_mph, pickup_hour) FROM 'cleaned_trips.csv' DELIMITER ',' CSV HEADER;"
