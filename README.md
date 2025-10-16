@@ -61,16 +61,16 @@ python --version
 # Start PostgreSQL
 - sudo service postgresql start
 
-# to REUN THE DATABASE CREATION SCRIPT
+# to Run the database creation script
 - cd Database
 - chmod +x setup_db.sh
 - bash setup_db.sh
 
-# CREATE PYTHON ENVIRONMENT
+# create python environment
 - cd to Urban-Mobility-Data-Explorer
 - run python3 -m venv venv
 
-# ACTIVETE THE PYTHON ENVIRONMENT 
+# activate python environment
 ## Linux / WSL / macOS
 - source venv/bin/activate
 
@@ -80,7 +80,7 @@ python --version
 ## Windows (PowerShell)
 - venv\Scripts\Activate.ps1
 
-# tO INSTALL REQUIRED PACKAGES 
+# to install required packages
 - pip install -r requirements.txt
 
 # to run the api
