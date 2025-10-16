@@ -1,11 +1,11 @@
 # NYC Taxi Trip 
 # Overview
 
-This first part handles cleaning the 2016 NYC Yellow Cab dataset (train.csv) for our Urban Mobility Data Explorer website. My script, data_cleaner.py, processes the raw data, removes bad records, adds three new features (trip_distance_miles, average_speed_mph, pickup_hour), and saves the cleaned data for the website’s database and visualizations.
+This first part handles cleaning the 2016 NYC Yellow Cab dataset (train.csv) for our Urban Mobility Data Explorer website. data_cleaner.py, processes the raw data, removes bad records, adds three new features (trip_distance_miles, average_speed_mph, pickup_hour), and saves the cleaned data for the website’s database and visualizations.
 
 # Setup Instructions for Running the Data Cleaning
 
-These steps show you how to set up and run my data cleaning script to get the cleaned data for the website.
+These steps show you how to set up and run our data cleaning script to get the cleaned data for the website.
 
 1. Get Python Ready:
 
@@ -33,11 +33,8 @@ python --version
 
 4. Run the Cleaning Script:
 
-- Open VS Code and navigate to data_processing/data_cleaner.py.
-
-- Run the script by right-clicking data_cleaner.py and selecting “Run Python File in Terminal” or type in the terminal:
-
 - cd data_processing
+
 - python data_cleaner.py
 
 - The script will clean train.csv (1,458,644 trips) and create two files in data_processing/:
