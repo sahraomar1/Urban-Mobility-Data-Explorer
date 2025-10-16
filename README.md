@@ -43,20 +43,6 @@ python --version
 
 - excluded_logs.csv: Log of 21,384 removed trips with reasons (for transparency).
 
-# Outputs for the Website
-
-- cleaned_trips.csv: Contains 1,437,260 trips with 14 columns:
-
-- Original: id, vendor_id, pickup_datetime, dropoff_datetime, passenger_count, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, store_and_fwd_flag, trip_duration.
-
-- New Features: trip_distance_miles (trip length in miles), average_speed_mph (speed in mph), pickup_hour (hour of pickup).
-
-- excluded_logs.csv: Shows why 21,384 trips were removed (e.g., invalid coordinates, unrealistic speeds).
-
-
-- Access: These files are too big for GitHub (>100 MB), so they can't be pushed to GitHub. Get them from https://drive.google.com/drive/folders/1P_xxrjYAfn7RiogkCTrDSo_FxsumYnLr
-
-
 
 
 ### SETUP INSTRUCTIONS 
@@ -100,3 +86,17 @@ pip install -r requirements.txt
 # to run the api
 cd to API
 run uvicorn trips_api:app --reload --port 8003
+
+
+# Outputs for the Website
+
+- cleaned_trips.csv: Contains 1,437,260 trips with 14 columns:
+
+- Original: id, vendor_id, pickup_datetime, dropoff_datetime, passenger_count, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, store_and_fwd_flag, trip_duration.
+
+- New Features: trip_distance_miles (trip length in miles), average_speed_mph (speed in mph), pickup_hour (hour of pickup).
+
+- excluded_logs.csv: Shows why 21,384 trips were removed (e.g., invalid coordinates, unrealistic speeds).
+
+
+- Access: These files are too big for GitHub (>100 MB), so they can't be pushed to GitHub. Get them from https://drive.google.com/drive/folders/1P_xxrjYAfn7RiogkCTrDSo_FxsumYnLr
