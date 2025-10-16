@@ -47,45 +47,45 @@ python --version
 
 ### SETUP INSTRUCTIONS 
 # CLONE REPOSITORY 
-git clone https://github.com/sahraomar1/Urban-Mobility-Data-Explorer.git
-cd Urban-Mobility-Data-Explorer
+- git clone https://github.com/sahraomar1/Urban-Mobility-Data-Explorer.git
+- cd Urban-Mobility-Data-Explorer
 
 
 # TO INSTALL THE CLEANED_CSV FILE TO THE DATABASE FOLDER
- RUN THE  install_cleaned_trips_csv.sh
+- RUN THE  install_cleaned_trips_csv.sh
 
 # to install  postgress (wsl)
-sudo apt update
-sudo apt install postgresql postgresql-contrib 
+- sudo apt update
+- sudo apt install postgresql postgresql-contrib 
 
 # Start PostgreSQL
-sudo service postgresql start
+- sudo service postgresql start
 
 # to REUN THE DATABASE CREATION SCRIPT
-cd Database
-chmod +x setup_db.sh
-bash setup_db.sh
+- cd Database
+- chmod +x setup_db.sh
+- bash setup_db.sh
 
 # CREATE PYTHON ENVIRONMENT
-cd to Urban-Mobility-Data-Explorer
-run python3 -m venv venv
+- cd to Urban-Mobility-Data-Explorer
+- run python3 -m venv venv
 
 # ACTIVETE THE PYTHON ENVIRONMENT 
 ## Linux / WSL / macOS
-source venv/bin/activate
+- source venv/bin/activate
 
 ## Windows (CMD)
-venv\Scripts\activate.bat
+- venv\Scripts\activate.bat
 
 ## Windows (PowerShell)
-venv\Scripts\Activate.ps1
+- venv\Scripts\Activate.ps1
 
 # tO INSTALL REQUIRED PACKAGES 
-pip install -r requirements.txt
+- pip install -r requirements.txt
 
 # to run the api
-cd to API
-run uvicorn trips_api:app --reload --port 8003
+- cd to API
+- run uvicorn trips_api:app --reload --port 8003
 
 
 # Outputs for the Website
