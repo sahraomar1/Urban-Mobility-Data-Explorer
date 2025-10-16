@@ -18,17 +18,15 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"], # Allows all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"], # Allows all headers
+    allow_methods=["*"], # Allowing all HTTP methods (GET,)
+    allow_headers=["*"], # Allowing all headers
 )
-
-
 
 # For connecting to PostgreSQL
 db = psycopg2.connect(
     host="localhost",
     user="postgres",
-    password="garangbse",  # for setting your password
+    password="garangbse", 
     dbname="nyc_taxi"
 )
 cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -91,7 +89,7 @@ def get_trip_distance_miles(limit: int = 100):
 
 # Code added by Rajveer for API: Allows for daily aggregation of trip counts
 
-# A helper function to avoid repeating the database connection logic
+# An aiding function to avoid repeating the database connection logics
 def get_db_cursor():
     db = psycopg2.connect(
         host="localhost",
@@ -123,7 +121,7 @@ def get_stats(date: str):
     cursor = get_db_cursor()
     MILES_TO_KM = 1.60934 # Conversion factor
     
-    # now calculates all stats and converts miles to km
+    # now it calculates all the stats and converts miles to km
     stats_query = f"""
         SELECT
             COUNT(*) AS total_trips,
