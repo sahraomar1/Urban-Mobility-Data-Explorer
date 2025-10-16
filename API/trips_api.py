@@ -26,7 +26,7 @@ app.add_middleware(
 db = psycopg2.connect(
     host="localhost",
     user="postgres",
-    password="garangbse", 
+    password="garangbuke", 
     dbname="nyc_taxi"
 )
 cursor = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -94,7 +94,7 @@ def get_db_cursor():
     db = psycopg2.connect(
         host="localhost",
         user="postgres",
-        password="garangbse",
+        password="garangbuke",
         dbname="nyc_taxi"
     )
     return db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
