@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+   
+    <!-- setup for the body of the index -->
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -50,7 +51,7 @@
     </style>
 </head>
 <body>
-
+    <!-- Sidebar for filters using basic css -->
     <div class="sidebar">
         <h2>Dashboard Filters</h2>
         <div style="margin-bottom: 20px;">
@@ -91,6 +92,8 @@
     </div>
 
     <script>
+        // java script for dynamic elements of the dashboard
+        // NOTE: MAKE SURE API IS ON 8003 PORT
         document.addEventListener('DOMContentLoaded', () => {
             const API_BASE_URL = 'http://127.0.0.1:8003';
             const dateSelector = document.getElementById('date-selector');
@@ -98,10 +101,11 @@
             const subtitle = document.getElementById('dashboard-subtitle');
             let tripsByHourChart, map, mapMarkers;
             
-            async function initializeDashboard() {
+            //initialises the dashboard by setting up map, chart, and fetching initial data
+            async function initialiseDashboard() {
                 try {
-                    initializeMap();
-                    initializeBarChart();
+                    initialiseMap();
+                    initialiseBarChart();
                     const dateInfo = await fetchData('/dates');
                     dateSelector.min = dateInfo.min_date;
                     dateSelector.max = dateInfo.max_date;
@@ -110,10 +114,10 @@
                     await loadAndDisplayDataForDate(dateInfo.max_date); 
                 } catch (error) {
                     subtitle.textContent = `Error: Could not connect to the API. Is it running?`;
-                    console.error("Initialization failed:", error);
+                    console.error("Initialisation failed:", error);
                 }
             }
-            
+            // function to get data from backen
             async function fetchData(endpoint) {
                 const response = await fetch(`${API_BASE_URL}${endpoint}`);
                 if (!response.ok) {
@@ -122,7 +126,8 @@
                 }
                 return response.json();
             }
-
+            // fetches and loads data for specific date fron backend
+            //async functions used to account for certain ui elements taking longer to load
             async function loadAndDisplayDataForDate(date) {
                 try {
                     subtitle.textContent = `Fetching data for ${date}...`;
@@ -140,14 +145,14 @@
                     console.error("Failed to display data:", error);
                 }
             }
-
-            function initializeMap() {
+            // map initialisation using openstreetmap and leaflet.js
+            function initialiseMap() {
                  map = L.map('map').setView([40.7580, -73.9855], 12);
                  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OSM' }).addTo(map);
                  mapMarkers = L.layerGroup().addTo(map);
             }
-
-            function initializeBarChart() {
+            // initialises the bar chart to display num of trips by the hour.
+            function initialiseBarChart() {
                 const context = document.getElementById('tripsByHourChart').getContext('2d');
                 tripsByHourChart = new Chart(context, {
                     type: 'bar',
@@ -164,6 +169,8 @@
                 });
             }
             
+            // function that does all the back end heavy lifting and pulls it.
+            // updates all the KPIs on dashboard depending on what date is selected dynamic
             function updateKPIs(stats) {
                 document.getElementById('stat-trips').textContent = Number(stats.total_trips || 0).toLocaleString();
                 document.getElementById('stat-passengers').textContent = Number(stats.total_passengers || 0).toLocaleString();
@@ -173,13 +180,14 @@
                 const busiestHour = stats.busiest_hour;
                 document.getElementById('stat-busiest-hour').textContent = busiestHour !== null ? `${busiestHour}:00 - ${busiestHour+1}:00` : '--';
             }
-
+            // bar rhaph change depending on date
             function updateBarChart(hourlyData) {
+                
                 hourlyData.sort((a, b) => a.hour - b.hour);
                 tripsByHourChart.data.datasets[0].data = hourlyData.map(item => item.count);
                 tripsByHourChart.update();
             }
-
+            // clears the map and updates to show new markers depending on date selected
             function updateMap(mapData) {
                 mapMarkers.clearLayers();
                 if (mapData.length === 0) return;
@@ -191,7 +199,7 @@
             tripIdBtn.addEventListener('click', async () => {
                 const tripId = document.getElementById('trip-id-search').value.trim();
                 if (!tripId) return; 
-
+                // Makes sure that data is selected for a single trip ID (if not then return errorr)
                 try {
                     const trip = await fetchData(`/trip/${tripId}`);
                     updateMap([trip]);
@@ -202,9 +210,10 @@
                 }
             });
             
+            //Allows the data on page to be updated dynamically upon date change on calendar
             dateSelector.addEventListener('change', (event) => loadAndDisplayDataForDate(event.target.value));
 
-            initializeDashboard();
+            initialiseDashboard();
         });
     </script>
 </body>
