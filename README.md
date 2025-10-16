@@ -100,3 +100,4 @@ python --version
 
 
 - Access: These files are too big for GitHub (>100 MB), so they can't be pushed to GitHub. Get them from https://drive.google.com/drive/folders/1P_xxrjYAfn7RiogkCTrDSo_FxsumYnLr
+Finally, open index.html from the Frontend folder in your browser to view the Urban Mobility Dashboard.
