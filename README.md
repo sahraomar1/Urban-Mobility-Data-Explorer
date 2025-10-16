@@ -74,7 +74,7 @@ python --version
 ## Linux / WSL / macOS
 - source venv/bin/activate
 
-## Windows (CMD)
+## Windows (CMD) 
 - venv\Scripts\activate.bat
 
 ## Windows (PowerShell)
