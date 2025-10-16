@@ -56,20 +56,47 @@ python --version
 
 - Access: These files are too big for GitHub (>100 MB), so they can't be pushed to GitHub. Get them from https://drive.google.com/drive/folders/1P_xxrjYAfn7RiogkCTrDSo_FxsumYnLr
 
-# to run the api 
-## on python terminal
-cd to API directory 
-on line 31 and 99 of trips_api.py change the password from "garangbse" to the password of your postgres server
-then run the trips_api.py
 
-# to create the postgres database 
-## on wsl
-put the cleaned_trips.csv file in the Database directory
-start a postgres server on your local machine with ("sudo systemctl start postgresql")
-run the script setupdb.sh
 
-### required packages
-fastapi==0.119.0
-uvicorn==0.37.0
-psycopg2-binary==2.9.9
-postgresql
+
+### SETUP INSTRUCTIONS 
+# CLONE REPOSITORY 
+git clone https://github.com/sahraomar1/Urban-Mobility-Data-Explorer.git
+cd Urban-Mobility-Data-Explorer
+
+
+# TO INSTALL THE CLEANED_CSV FILE TO THE DATABASE FOLDER
+ RUN THE  install_cleaned_trips_csv.sh
+
+# to install  postgress (wsl)
+sudo apt update
+sudo apt install postgresql postgresql-contrib 
+
+# Start PostgreSQL
+sudo service postgresql start
+
+# to REUN THE DATABASE CREATION SCRIPT
+cd Database
+chmod +x setup_db.sh
+bash setup_db.sh
+
+# CREATE PYTHON ENVIRONMENT
+cd to Urban-Mobility-Data-Explorer
+run python3 -m venv venv
+
+# ACTIVETE THE PYTHON ENVIRONMENT 
+## Linux / WSL / macOS
+source venv/bin/activate
+
+## Windows (CMD)
+venv\Scripts\activate.bat
+
+## Windows (PowerShell)
+venv\Scripts\Activate.ps1
+
+# tO INSTALL REQUIRED PACKAGES 
+pip install -r requirements.txt
+
+# to run the api
+cd to API
+run uvicorn trips_api:app --reload --port 8003
