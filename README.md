@@ -59,14 +59,17 @@ python --version
 # to run the api 
 ## on python terminal
 cd to API directory 
-run C:/Python313/python.exe -m uvicorn API.trips_api:app --reload --port 8003
+on line 31 and 99 of trips_api.py change the password from "garangbse" to the password of your postgres server
+then run the trips_api.py
 
-# to start db 
+# to create the postgres database 
 ## on wsl
 put the cleaned_trips.csv file in the Database directory
+start a postgres server on your local machine with ("sudo systemctl start postgresql")
 run the script setupdb.sh
 
-### required python packages
+### required packages
 fastapi==0.119.0
 uvicorn==0.37.0
 psycopg2-binary==2.9.9
+postgresql
