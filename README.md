@@ -51,8 +51,10 @@ python --version
 - cd Urban-Mobility-Data-Explorer
 
 
+
 # TO INSTALL THE CLEANED_CSV FILE TO THE DATABASE FOLDER
-- install_cleaned_trips_csv.sh
+- sudo apt install dos2unix -y
+- dos2unix install_cleaned_trips_csv.sh
 
 # to install  postgress (wsl)
 - sudo apt update
@@ -64,11 +66,12 @@ python --version
 # to Run the database creation script
 - cd Database
 - chmod +x setup_db.sh
-- bash setup_db.sh
+- dos2unix setup_db.sh
 
 # create python environment
 - cd Urban-Mobility-Data-Explorer
-- run python3 -m venv venv
+- apt install python3.12-venv
+- python3 -m venv venv
 
 # activate python environment
 ## Linux / WSL / macOS
